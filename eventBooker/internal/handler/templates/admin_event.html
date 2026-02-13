@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Event.Title}} - Админ</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .event-info { border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .bookings { margin-top: 20px; }
+        .booking { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .booking.booked { border-left: 4px solid #ffc107; }
+        .booking.confirmed { border-left: 4px solid #28a745; }
+        .booking.cancelled { border-left: 4px solid #dc3545; }
+        .btn { padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; display: inline-block; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        form { display: inline; }
+    </style>
+</head>
+<body>
+    <h1>Детали события: {{.Event.Title}}</h1>
+    <a href="/ui/admin/events" class="btn">← Вернуться к списку</a>
+    
+    <div class="event-info">
+        <h2>{{.Event.Title}}</h2>
+        <p><strong>Дата и время:</strong> {{.Event.StartTime.Format "2006-01-02 15:04"}}</p>
+        <p><strong>Вместимость:</strong> {{.Event.Capacity}} мест</p>
+        <p><strong>Свободные места:</strong> {{.FreePlaces}}</p>
+    </div>
+
+    <div class="bookings">
+        <h3>Бронирования ({{len .Bookings}})</h3>
+        {{range .Bookings}}
+        <div class="booking {{.Status}}">
+            <p><strong>UserID:</strong> {{.UserID}}</p>
+            <p><strong>Статус:</strong> {{.Status}}</p>
+            <p><strong>Создано:</strong> {{.CreatedAt.Format "2006-01-02 15:04"}}</p>
+            <p><strong>Истекает:</strong> {{.ExpiresAt.Format "2006-01-02 15:04"}}</p>
+            {{if eq .Status "booked"}}
+            user_id
+            <form action="/ui/admin/events/{{$.Event.ID}}/confirm" method="post">
+                <input type="hidden" name="booking_id" value="{{.ID}}">
+                <input type="hidden" name="event_id" value="{{$.Event.ID}}">
+                <button type="submit" class="btn btn-success">Подтвердить бронь</button>
+            </form>
+            {{end}}
+        </div>
+        {{else}}
+        <p>Бронирований нет</p>
+        {{end}}
+    </div>
+</body>
+</html>
+

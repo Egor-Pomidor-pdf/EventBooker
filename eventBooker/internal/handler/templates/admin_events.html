@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>События - Админ</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .event { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .event h3 { margin-top: 0; }
+        .btn { padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; display: inline-block; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .bookings { margin-top: 10px; font-size: 0.9em; }
+        .booking { padding: 5px; margin: 5px 0; background: #f8f9fa; border-left: 3px solid #007bff; }
+        .booking.confirmed { border-left-color: #28a745; }
+        .booking.cancelled { border-left-color: #dc3545; }
+        .free-places { color: green; font-weight: bold; }
+        .no-places { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+            <div class="link">
+            <a href="/ui/register">← Вход</a>
+        </div>
+    <h1>Управление событиями (Админ-панелаааааь)</h1>
+    <a href="/ui/user/events" style="float: right;">Пользовательский режим</a>
+        <h1>Создать новое событие</h1>
+    <form action="/ui/admin/events/new" method="post">
+        <label>Название: <input type="text" name="title"></label><br>
+        <label>Дата и время (RFC3339):<input type="datetime-local" name="start_time" required></label><br>
+        <label>Количество мест: <input type="number" name="capacity"></label><br>
+        <label>Админ? <input type="checkbox" name="admin" value="1"></label><br>
+        <button type="submit">Создать</button>
+    </form>
+    
+    <div>
+        {{range .}}
+        <div class="event">
+            <h3>{{.Title}}</h3>
+            <p><strong>Дата и время:</strong> {{.StartTime.Format "2006-01-02 15:04"}}</p>
+            <p><strong>Вместимость:</strong> {{.Capacity}} мест</p>
+            <p>
+                <strong>Свободные места:</strong> 
+                {{if gt .FreePlaces 0}}
+                    <span class="free-places">{{.FreePlaces}}</span>
+                {{else}}
+                    <span class="no-places">Нет свободных мест</span>
+                {{end}}
+            </p>
+            <p><strong>Всего бронирований:</strong> {{.TotalBooked}}</p>
+            
+            <a href="/ui/admin/events/{{.ID}}" class="btn">Детали</a>
+            
+            {{if gt (len .Bookings) 0}}
+            <div class="bookings">
+                <strong>Бронирования:</strong>
+                {{range .Bookings}}
+                <div class="booking {{.Status}}">
+                    UserID: {{.UserID}} | Статус: {{.Status}} | 
+                    Создано: {{.CreatedAt.Format "2006-01-02 15:04"}} | 
+                    Истекает: {{.ExpiresAt.Format "2006-01-02 15:04"}}
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <p>Событий нет</p>
+        {{end}}
+    </div>
+</body>
+</html>
+

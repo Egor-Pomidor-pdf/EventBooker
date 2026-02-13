@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Event.Title}} - Бронирование</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .event-info { border: 1px solid #ddd; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"] { width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 3px; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .free-places { color: green; font-weight: bold; }
+        .no-places { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Бронирование места</h1>
+    <a href="/ui/user/events">← Вернуться к списку</a>
+    
+    <div class="event-info">
+        <h2>{{.Event.Title}}</h2>
+        <p><strong>Дата и время:</strong> {{.Event.StartTime.Format "2006-01-02 15:04"}}</p>
+        <p><strong>Вместимость:</strong> {{.Event.Capacity}} мест</p>
+        <p>
+            <strong>Свободные места:</strong> 
+            {{if gt .FreePlaces 0}}
+                <span class="free-places">{{.FreePlaces}}</span>
+            {{else}}
+                <span class="no-places">Нет свободных мест</span>
+            {{end}}
+        </p>
+    </div>
+
+    {{if gt .FreePlaces 0}}
+    <form action="/ui/user/events/{{.Event.ID}}/book" method="post">
+        <button type="submit" class="btn">Забронировать место</button>
+    </form>
+    {{else}}
+    <p style="color: red;">К сожалению, свободных мест нет.</p>
+    {{end}}
+
+    <hr style="margin: 30px 0;">
+
+    <h2>Подтвердить бронирование</h2>
+    <form action="/ui/user/events/{{.Event.ID}}/confirm" method="post">
+        <button type="submit" class="btn" style="background: #28a745;">Подтвердить бронь</button>
+    </form>
+</body>
+</html>
+

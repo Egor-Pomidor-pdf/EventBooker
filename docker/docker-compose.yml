@@ -1,0 +1,41 @@
+services:
+  imageprocessor:
+    build:
+      context: ../eventbooker
+      dockerfile: Dockerfile
+    image: eventbooker:latest
+    restart: unless-stopped
+    env_file:
+      - ../config/.env
+    depends_on:
+      - postgres_master
+    ports:
+      - "8089:8089"
+    expose:
+      - "8089"
+    networks:
+      - backend
+  postgres_master:
+    image: postgres:16-alpine
+    ports:
+      - "5435:5432"
+    env_file:
+      - ../config/.env
+    volumes:
+      - postgres_master_data:/var/lib/postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+volumes:
+  postgres_master_data:
+
+
+networks:
+  backend:
+    driver: bridge

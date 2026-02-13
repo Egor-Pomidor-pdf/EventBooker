@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>События - Пользователь</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .event { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .event h3 { margin-top: 0; }
+        .btn { padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; display: inline-block; margin-top: 10px; }
+        .btn:hover { background: #0056b3; }
+        .free-places { color: green; font-weight: bold; }
+        .no-places { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+            <div class="link">
+            <a href="/ui/register">← Вход</a>
+        </div>
+    <h1>Доступные события</h1>
+    <a href="/ui/admin/events" style="float: right;">Админ-панель</a>
+    <div>
+        {{range .}}
+        <div class="event">
+            <h3>{{.Title}}</h3>
+            <p><strong>Дата и время:</strong> {{.StartTime.Format "2006-01-02 15:04"}}</p>
+            <p><strong>Вместимость:</strong> {{.Capacity}} мест</p>
+            <p>
+                <strong>Свободные места:</strong> 
+                {{if gt .FreePlaces 0}}
+                    <span class="free-places">{{.FreePlaces}}</span>
+                {{else}}
+                    <span class="no-places">Нет свободных мест</span>
+                {{end}}
+            </p>
+            {{if gt .FreePlaces 0}}
+                <a href="/ui/user/events/{{.ID}}" class="btn">Забронировать</a>
+            {{end}}
+        </div>
+        {{else}}
+        <p>Событий нет</p>
+        {{end}}
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+# Binaries
+bin/
+*.exe
+*.out
+
+# Dependencies
+vendor/
+go.sum
+
+
+# Database data
+pgdata/
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
