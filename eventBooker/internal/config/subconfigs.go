@@ -12,6 +12,7 @@ type PostgresConfig struct {
 type ServerConfig struct {
 	Host string `env:"SERVER_HOST"` 
 	Port int    `yaml:"SERVER_PORT"` 
+	PprofAddr string `env:"PPROF_ADDR"`
 }
 
 type RetryConfig struct {
@@ -19,4 +20,3 @@ type RetryConfig struct {
 	DelayMilliseconds int     `env:"DELAY_MS"`
 	Backoff           float64 `env:"BACKOFF"`
 }
-

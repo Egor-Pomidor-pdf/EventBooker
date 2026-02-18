@@ -11,6 +11,7 @@ services:
       - postgres_master
     ports:
       - "8089:8089"
+      - "6060:6060"
     expose:
       - "8089"
     networks:

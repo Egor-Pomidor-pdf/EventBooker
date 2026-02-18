@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"time"
@@ -44,6 +46,15 @@ func main() {
 
 	// strategies
 	postgresRetryStrategy := config.MakeStrategy(cfg.Database.PostgresRetryConfig)
+
+	if cfg.Server.PprofAddr != "" {
+		go func() {
+			zlog.Logger.Info().Str("addr", cfg.Server.PprofAddr).Msg("pprof server start")
+			if err := http.ListenAndServe(cfg.Server.PprofAddr, nil); err != nil {
+				zlog.Logger.Error().Err(err).Msg("pprof server stopped")
+			}
+		}()
+	}
 
 	// connect to db
 	var postgresDB *dbpg.DB

@@ -46,6 +46,7 @@ func NewConfig(envFilePath string, configFilePath string) (*Config, error) {
 	//server
 	myConfig.Server.Host = cfg.GetString("SERVER_HOST")
 	myConfig.Server.Port = cfg.GetInt("SERVER_PORT")
+	myConfig.Server.PprofAddr = cfg.GetString("PPROF_ADDR")
 
 	return myConfig, nil
 }
