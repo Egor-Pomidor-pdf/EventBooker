@@ -72,6 +72,11 @@ func (s *service) GetAllEvents(ctx context.Context) ([]*models.Event, error) {
 	return upcoming, nil
 }
 
+// GetAllEventsWithFreePlaces возвращает будущие события вместе с количеством свободных мест
+func (s *service) GetAllEventsWithFreePlaces(ctx context.Context) ([]models.EventWithFreePlaces, error) {
+	return s.repo.GetAllEventsWithFreePlaces(ctx)
+}
+
 // CountFreePlaces возвращает количество свободных мест для события
 func (s *service) CountFreePlaces(ctx context.Context, eventID int64) (int64, error) {
 	event, err := s.GetEventByID(ctx, eventID)

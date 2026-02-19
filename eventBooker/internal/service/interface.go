@@ -16,6 +16,7 @@ type Service interface {
 	CreateEvent(ctx context.Context, event *models.Event, isAdmin bool) (*models.Event, error) // только админ
 	GetEventByID(ctx context.Context, eventID int64) (*models.Event, error)
 	GetAllEvents(ctx context.Context) ([]*models.Event, error)
+	GetAllEventsWithFreePlaces(ctx context.Context) ([]models.EventWithFreePlaces, error)
 	CountFreePlaces(ctx context.Context, eventID int64) (int64, error) // возвращает количество свободных мест
 
 	CreateUser(ctx context.Context, user *models.User) (*models.User, error)

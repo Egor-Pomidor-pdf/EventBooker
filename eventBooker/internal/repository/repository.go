@@ -111,6 +111,50 @@ func (p *PostgresRepository) GetAllEvents(ctx context.Context) ([]*models.Event,
 	return events, nil
 }
 
+// GetAllEventsWithFreePlaces возвращает будущие мероприятия и количество свободных мест
+func (p *PostgresRepository) GetAllEventsWithFreePlaces(ctx context.Context) ([]models.EventWithFreePlaces, error) {
+	query := `
+		SELECT
+			e.id, e.title, e.start_time, e.capacity, e.created_at,
+			GREATEST(e.capacity - COALESCE(b.cnt, 0), 0) AS free_places
+		FROM events e
+		LEFT JOIN (
+			SELECT event_id, COUNT(*) AS cnt
+			FROM bookings
+			WHERE status IN ('booked', 'confirmed')
+			GROUP BY event_id
+		) b ON b.event_id = e.id
+		WHERE e.start_time > NOW()
+		ORDER BY e.start_time
+	`
+
+	rows, err := p.db.Master.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка repository при получении events с free places: %w", err)
+	}
+	defer rows.Close()
+
+	var events []models.EventWithFreePlaces
+	for rows.Next() {
+		var e models.Event
+		var free int64
+		if err := rows.Scan(&e.ID, &e.Title, &e.StartTime, &e.Capacity, &e.CreatedAt, &free); err != nil {
+			return nil, fmt.Errorf("ошибка при сканировании row: %w", err)
+		}
+		event := e
+		events = append(events, models.EventWithFreePlaces{
+			Event:      &event,
+			FreePlaces: free,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("ошибка во время перебора rows: %w", err)
+	}
+
+	return events, nil
+}
+
 // CreateUser создаёт нового пользователя
 func (p *PostgresRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	if user == nil {

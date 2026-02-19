@@ -54,33 +54,13 @@ func (h *handler) CreateEvent(c *ginext.Context) {
 func (h *handler) GetAllEvents(c *ginext.Context) {
 	ctx := c.Request.Context()
 
-	events, err := h.service.GetAllEvents(ctx)
+	events, err := h.service.GetAllEventsWithFreePlaces(ctx)
 	if err != nil {
 		zlog.Logger.Err(err).Msg("GetAllEvents: failed to fetch events")
 		c.AbortWithStatusJSON(http.StatusInternalServerError, ginext.H{"error": "error fetching events"})
 		return
 	}
-
-	type EventWithFree struct {
-		*models.Event
-		FreePlaces int64 `json:"free_places"`
-	}
-
-	var out []EventWithFree
-	for _, e := range events {
-		free, err := h.service.CountFreePlaces(ctx, e.ID)
-		if err != nil {
-			zlog.Logger.Err(err).Int64("event_id", e.ID).Msg("GetAllEvents: failed to count free places")
-			c.AbortWithStatusJSON(http.StatusInternalServerError, ginext.H{"error": "error counting free places"})
-			return
-		}
-		out = append(out, EventWithFree{
-			Event:      e,
-			FreePlaces: free,
-		})
-	}
-
-	c.JSON(http.StatusOK, out)
+	c.JSON(http.StatusOK, events)
 }
 
 // GetEvent — возвращает информацию об одном событии

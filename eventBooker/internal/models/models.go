@@ -10,6 +10,11 @@ type Event struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type EventWithFreePlaces struct {
+	*Event
+	FreePlaces int64 `json:"free_places"`
+}
+
 type User struct {
 	ID      int64  `json:"id"`
 	Name    string `json:"name"`
