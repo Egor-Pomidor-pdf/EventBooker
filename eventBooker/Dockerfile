@@ -8,8 +8,8 @@ RUN go mod download
 # Потом исходники
 COPY . .
 
-# Собираем статический бинарь
-RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/imageprocessor ./cmd
+# Собираем статический бинарь (jsoniter для ускорения JSON)
+RUN CGO_ENABLED=0 GOOS=linux go build -tags=jsoniter -o /bin/imageprocessor ./cmd
 
 # ---- runtime stage ----
 FROM alpine:3.20
@@ -23,4 +23,3 @@ COPY --from=build /app/internal/migrations /app/internal/migrations
 EXPOSE 8089
 
 ENTRYPOINT ["/bin/imageprocessor"]
-
