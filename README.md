@@ -54,3 +54,44 @@
 
 ```bash
 docker compose up --build
+```
+
+---
+
+## Performance Optimization (2026-02-19)
+
+Ниже зафиксированы измерения и изменения производительности для эндпоинта `GET /events`.
+
+Нагрузка и окружение:
+- Нагрузка: `hey -z 30s -c 50 http://localhost:8089/events`
+- Данные: в БД создано ~200 будущих событий
+- Профили: `net/http/pprof` (CPU, heap, trace)
+
+### Baseline (до оптимизаций)
+RPS 62.9, avg 0.791s, p95 1.104s, p99 1.188s.
+
+### Оптимизация №1 — устранение N+1 в `GET /events`
+Сделан один SQL‑запрос с `JOIN + COUNT`, вместо цикла запросов по событиям.
+
+Результат после оптимизации №1:
+RPS 1818.5, avg 0.0275s, p95 0.0524s, p99 0.0730s.
+
+### Оптимизация №2 — ускорение JSON сериализации (jsoniter)
+Gin собран с build‑tag `jsoniter`.
+
+Результат после оптимизации №2:
+RPS 2152.8, avg 0.0232s, p95 0.0426s, p99 0.0603s.
+
+### Микробенчмарк (benchstat)
+Бенчмарк сериализации ответа `/events`:
+
+```bash
+go test -bench=BenchmarkEventsJSON -benchmem -count=10 ./internal/handler > /tmp/bench_before.txt
+go test -bench=BenchmarkEventsJSON -benchmem -count=10 -tags=jsoniter ./internal/handler > /tmp/bench_after.txt
+benchstat /tmp/bench_before.txt /tmp/bench_after.txt
+```
+
+Результат benchstat:
+- `sec/op`: 92.47µ → 57.10µ (−38.25%)
+- `B/op`: 45.43Ki → 45.45Ki (≈ без изменений)
+- `allocs/op`: 401 → 401 (без изменений)
